@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Collection Report</string>
+    <string name="lt"><![CDATA[<]]></string>
+    <string name="month_year">Month Year</string>
+    <string name="gt"><![CDATA[>]]></string>
+    <string name="grand_total">GRAND TOTAL</string>
+    <string name="_0_00">0.00</string>
+    <string name="print">Print</string>
+    <string name="collector_name">Collector Name</string>
+    <string name="_99_99_9999">99/99/9999</string>
+    <string name="select_category">Select Category</string>
+    <string name="daily">Daily</string>
+    <string name="monthly">Monthly</string>
+    <string name="collectorprofilepicture">CollectorProfilePicture</string>
+    <string name="collectorname">CollectorName</string>
+    <string name="_3rd">3rd</string>
+    <string name="caption1">Caption1</string>
+    <string name="amount1">Amount1</string>
+    <string name="caption2">Caption2</string>
+    <string name="amount2">Amount2</string>
+    <string name="_1">1</string>
+    <string name="_0_0">0.0</string>
+    <string name="todo">TODO</string>
+</resources>
