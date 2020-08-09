@@ -14,7 +14,7 @@
         android:layout_marginStart="3dp"
         android:onClick="gotoPreviousMonth"
         android:text="@string/lt"
-        android:textSize="27sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/textViewMonth"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,7 +26,7 @@
         android:layout_marginTop="2dp"
         android:text="@string/month_year"
         android:textAlignment="center"
-        android:textSize="38sp"
+        android:textSize="30sp"
         app:layout_constraintEnd_toStartOf="@+id/buttonNext"
         app:layout_constraintStart_toEndOf="@+id/buttonPrev"
         app:layout_constraintTop_toTopOf="parent" />
@@ -39,7 +39,7 @@
         android:layout_marginEnd="3dp"
         android:onClick="gotoNextMonth"
         android:text="@string/gt"
-        android:textSize="27sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/textViewMonth"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

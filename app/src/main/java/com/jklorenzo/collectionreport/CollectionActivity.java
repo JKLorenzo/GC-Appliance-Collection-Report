@@ -61,7 +61,8 @@ public class CollectionActivity extends AppCompatActivity {
         CollectorIndex = getIntent().getIntExtra("CollectorIndex", 0);
         CollectorName = DatabaseHelper.NAMES[CollectorIndex];
 
-        db = new DatabaseHelper(super.getBaseContext(), Table_Name);
+        db = new DatabaseHelper(super.getBaseContext());
+        db.openTable(Table_Name);
         res = db.getCollectorData(CollectorName);
         res.moveToNext();
 

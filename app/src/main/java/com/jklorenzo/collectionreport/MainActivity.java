@@ -9,6 +9,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -48,7 +49,7 @@ import static android.widget.Toast.makeText;
 
 public class MainActivity extends AppCompatActivity {
 
-    int day, month, year;
+    int month, year;
     double[] totals;
     double grandTotal;
     String[] monthText = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerViewCollectorCaption;
 
     DatabaseHelper db;
+    SharedPreferences sessionPreference;
     ArrayList<CollectorCaption> collectorCaptions;
     CollectorCaptionRecyclerViewAdapter collectorCaptionRVA;
     Cursor res;
@@ -69,9 +71,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
-        day = calendar.get(Calendar.DATE);
-        month = calendar.get((Calendar.MONTH));
-        year = calendar.get(Calendar.YEAR);
+        sessionPreference = getSharedPreferences("Session", Context.MODE_PRIVATE);
+        month = sessionPreference.getInt("Month", calendar.get((Calendar.MONTH)));
+        year = sessionPreference.getInt("Year", calendar.get(Calendar.YEAR));
+
+        db = new DatabaseHelper(this);
 
         textViewMonth = findViewById(R.id.textViewMonth);
         textViewGT = findViewById(R.id.textViewGT);
@@ -99,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             month = 0;
             year++;
         }
-        db.onChangeTable(monthText[month] +  year);
+        db.openTable(monthText[month] +  year);
         reloadDatabase();
         reloadDisplay(false);
     }
@@ -110,14 +114,14 @@ public class MainActivity extends AppCompatActivity {
             month = 11;
             year--;
         }
-        db.onChangeTable(monthText[month] +  year);
+        db.openTable(monthText[month] +  year);
         reloadDatabase();
         reloadDisplay(false);
     }
 
     public void reloadDatabase(){
         try{
-            db = new DatabaseHelper(this, monthText[month] +  year);
+            db.openTable(monthText[month] +  year);
             res = db.getAllData();
             if(res.getCount() == 0) {
                 db.setDefaultData();
@@ -125,20 +129,41 @@ public class MainActivity extends AppCompatActivity {
                     try{
                         Thread.sleep(250);
                     } catch (Exception ignored){}
-                    db = new DatabaseHelper(this, db.getTABLE_NAME());
                     res = db.getAllData();
                 } while (res.getCount() == 0);
                 Toast.makeText(this, "Database Created for " + monthText[month] + " " + year, Toast.LENGTH_LONG).show();
             }
         } catch (Exception e){
             makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        } finally {
+            SharedPreferences.Editor sessioneditor = sessionPreference.edit();
+            sessioneditor.putInt("Month", month);
+            sessioneditor.putInt("Year", year);
+            sessioneditor.apply();
         }
+    }
+
+    public double getTotal(int month, int year){
+        DatabaseHelper this_dbh = new DatabaseHelper(this);
+        this_dbh.openTable(monthText[month] + year);
+        Cursor this_res = this_dbh.getAllData();
+        double this_total = 0;
+        for (int i = 0; i < this_res.getCount(); i++){
+            this_res.moveToNext();
+            double current_total = 0;
+            for (int j = 1; j <= 32; j++)
+                current_total += this_res.getDouble(j);
+            current_total -= this_res.getDouble(33);
+            this_total += current_total;
+        }
+        return this_total;
     }
 
     ArrayList<Rank> ranks;
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     public void reloadDisplay(boolean initialize){
         textViewMonth.setText(monthText[month] + " " + year);
+        db.openTable(monthText[month] + year);
         res = db.getAllData();
         totals = new double[res.getCount()];
         ranks = new ArrayList<>();
@@ -230,39 +255,56 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 200) {// Print Process
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                generatePDFFile();
+                new GeneratePDFFile(this, month, year).execute();
             } else {
                 makeText(this, "Printing denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    BaseFont timesroman, timesbold;
-    public void generatePDFFile(){
-        try{
-            timesroman = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.EMBEDDED);
-            timesbold = BaseFont.createFont(BaseFont.TIMES_BOLD, BaseFont.CP1252, BaseFont.EMBEDDED);
-            new GenerateExcelFile(db, monthText[month], year).execute();
-        } catch (Exception e){
-            makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
     @SuppressLint("StaticFieldLeak")
-    private class GenerateExcelFile extends AsyncTask<String, Integer, String> {
-
+    private class GeneratePDFFile extends AsyncTask<String, Integer, String> {
         DatabaseHelper db;
-        String month, year;
-        GenerateExcelFile(DatabaseHelper db, String month, int year){
-            this.db = db;
+        BaseFont timesroman, timesbold;
+        int month, year;
+        String percent = "";
+        GeneratePDFFile(Context context, int month, int year){
+            db = new DatabaseHelper(context);
+            db.openTable(monthText[month] + year);
             this.month = month;
-            this.year = String.valueOf(year);
+            this.year = year;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
             makeText(MainActivity.this, "Generating PDF File", Toast.LENGTH_SHORT).show();
+
+            int previousmonth = month;
+            int previousyear = year;
+
+            previousmonth--;
+            if (previousmonth <= -1){
+                previousmonth = 11;
+                previousyear--;
+            }
+            double previous_grandTotal = MainActivity.this.getTotal(previousmonth, previousyear);
+            if (previous_grandTotal != 0){
+                double equivalent = 100 * (grandTotal - previous_grandTotal) / previous_grandTotal;
+                if (equivalent >= 0){
+                    percent = "(+" + String.format("%.2f", equivalent) + "%)";
+                } else {
+                    percent = "(-" + String.format("%.2f", equivalent) + "%)";
+                }
+            }
+
+            try{
+                timesroman = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.EMBEDDED);
+                timesbold = BaseFont.createFont(BaseFont.TIMES_BOLD, BaseFont.CP1252, BaseFont.EMBEDDED);
+            } catch (Exception e){
+                makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
         @SuppressLint("DefaultLocale")
         @Override
@@ -282,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // HEADERS
                 Font font = new Font(timesbold, 14);
-                x = new String[]{"GC APPLIANCE CORPORATION", "COLLECTION REPORT", "FOR " + month.toUpperCase() + " " + year.toUpperCase()};
+                x = new String[]{"GC APPLIANCE CORPORATION", "COLLECTION REPORT", "FOR " + monthText[month].toUpperCase() + " " + String.valueOf(year).toUpperCase()};
                 for(String y : x){
                     cell = new PdfPCell(new Phrase(y, font));
                     cell.setColspan(9);
@@ -488,29 +530,36 @@ public class MainActivity extends AppCompatActivity {
                 cell = new PdfPCell(new Phrase("GRAND TOTAL", font));
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 cell.setBorder(Rectangle.NO_BORDER);
-                cell.setColspan(3);
+                cell.setColspan(2);
                 table.addCell(cell);
 
                 temp = String.format("%.2f", grandTotal);
                 if (temp.contains(".00"))
                     temp = temp.replace(".00", "");
-                cell = new PdfPCell(new Phrase(temp, font));
+                cell = new PdfPCell(new Phrase(temp + " " + percent, font));
                 cell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 cell.setBorder(Rectangle.NO_BORDER);
-                cell.setColspan(2);
+                cell.setColspan(3);
                 table.addCell(cell);
 
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 10; i++)
+                for (int i = 1; i <= 1; i++)
                     table.addCell(cell);
+
+                // TRADEMARK
+                font = new Font(timesroman, 9);
+                cell = new PdfPCell(new Phrase("| Prepared by N.Lorenzo |", font));
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cell.setBorder(Rectangle.NO_BORDER);
+                cell.setColspan(2);
+                table.addCell(cell);
 
                 // Save Table
                 table.setHorizontalAlignment(Element.ALIGN_CENTER);
                 document.add(table);
                 document.close();
-                Thread.sleep(2000);
             } catch (Exception e){
                 Log.e("********ERROR********", Objects.requireNonNull(e.getMessage()));
             }
