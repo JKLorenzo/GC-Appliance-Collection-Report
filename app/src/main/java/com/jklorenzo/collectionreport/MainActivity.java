@@ -267,7 +267,6 @@ public class MainActivity extends AppCompatActivity {
         DatabaseHelper db;
         BaseFont timesroman, timesbold;
         int month, year;
-        String percent = "";
         GeneratePDFFile(Context context, int month, int year){
             db = new DatabaseHelper(context);
             db.openTable(monthText[month] + year);
@@ -280,24 +279,6 @@ public class MainActivity extends AppCompatActivity {
             super.onPreExecute();
 
             makeText(MainActivity.this, "Generating PDF File", Toast.LENGTH_SHORT).show();
-
-            int previousmonth = month;
-            int previousyear = year;
-
-            previousmonth--;
-            if (previousmonth <= -1){
-                previousmonth = 11;
-                previousyear--;
-            }
-            double previous_grandTotal = MainActivity.this.getTotal(previousmonth, previousyear);
-            if (previous_grandTotal != 0){
-                double equivalent = 100 * (grandTotal - previous_grandTotal) / previous_grandTotal;
-                if (equivalent >= 0){
-                    percent = "(+" + String.format("%.2f", equivalent) + "%)";
-                } else {
-                    percent = "(-" + String.format("%.2f", equivalent) + "%)";
-                }
-            }
 
             try{
                 timesroman = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.EMBEDDED);
@@ -536,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
                 temp = String.format("%.2f", grandTotal);
                 if (temp.contains(".00"))
                     temp = temp.replace(".00", "");
-                cell = new PdfPCell(new Phrase(temp + " " + percent, font));
+                cell = new PdfPCell(new Phrase(temp, font));
                 cell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 cell.setBorder(Rectangle.NO_BORDER);
                 cell.setColspan(3);
