@@ -15,7 +15,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "CollectionReport.db";
     private SQLiteDatabase db;
     private String TABLE_NAME;
-    public static final String[] NAMES = {"Edmund(Monthly)", "Edmund(Daily)", "Johnny(Monthly)", "Johnny(Daily)", "Ricky(Monthly)", "Charlie(Monthly)", "Romy(Monthly)", "Allan(Monthly)"};
+    public static final String[] NAMES = {"Edmund(Monthly)", "Edmund(Daily)", "Johnny(Monthly)", "Johnny(Daily)", "Ricky(Monthly)", "Charlie(Monthly)", "Romy(Monthly)", "Allan(Monthly)", "Delfin(Monthly)"};
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -63,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void setDefaultData(){
-        for (int i = 0; i <= 7; i++){
+        for (int i = 0; i <= NAMES.length; i++){
             ContentValues cv = new ContentValues();
             cv.put("NAME", NAMES[i]);
             for (int j = 1; j <= 33; j++){

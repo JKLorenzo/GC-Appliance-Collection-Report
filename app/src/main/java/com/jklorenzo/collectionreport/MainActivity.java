@@ -41,7 +41,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     double[] totals;
     double grandTotal;
     String[] monthText = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-    String[] NAMES = {"Edmund", "Johnny", "Ricky", "Charlie", "Romy", "Allan"};
+    String[] NAMES = {"Edmund", "Johnny", "Ricky", "Charlie", "Romy", "Allan", "Delfin"};
     String[] ranking;
 
     TextView textViewMonth, textViewGT;
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void reloadDatabase(){
         try{
-            db.openTable(monthText[month] +  year);
+            db.openTable(monthText[month] + year);
             res = db.getAllData();
             if(res.getCount() == 0) {
                 db.setDefaultData();
@@ -187,10 +189,12 @@ public class MainActivity extends AppCompatActivity {
             ranks.add(new Rank(4, totals[6]));
         if (totals[7] >= 170000)
             ranks.add(new Rank(5, totals[7]));
+        if (totals[8] >= 170000)
+            ranks.add(new Rank(6, totals[8]));
 
         String[] rankCaption = {"1st", "2nd", "3rd"};
         int rankSize = ranks.size();
-        ranking = new String[]{"", "", "", "", "", ""};
+        ranking = new String[]{"", "", "", "", "", "", ""};
         for (int i = 0; i < rankSize; i++){
             if (i == 3)
                 break;
@@ -211,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
             collectorCaptions.add(new CollectorCaption(NAMES[3], ranking[3],"", "", "Monthly", String.format("%.2f", totals[5]), R.drawable.icon3));
             collectorCaptions.add(new CollectorCaption(NAMES[4], ranking[4],"", "", "Monthly", String.format("%.2f", totals[6]), R.drawable.icon4));
             collectorCaptions.add(new CollectorCaption(NAMES[5], ranking[5],"", "", "Monthly", String.format("%.2f", totals[7]), R.drawable.icon5));
+            collectorCaptions.add(new CollectorCaption(NAMES[6], ranking[6],"", "", "Monthly", String.format("%.2f", totals[8]), R.drawable.icon6));
             collectorCaptionRVA = new CollectorCaptionRecyclerViewAdapter(this, collectorCaptions);
             recyclerViewCollectorCaption.setAdapter(collectorCaptionRVA);
             recyclerViewCollectorCaption.setLayoutManager(new LinearLayoutManager(this));
@@ -221,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
             collectorCaptions.set(3, new CollectorCaption(NAMES[3], ranking[3],"", "", "Monthly", String.format("%.2f", totals[5]), R.drawable.icon3));
             collectorCaptions.set(4, new CollectorCaption(NAMES[4], ranking[4],"", "", "Monthly", String.format("%.2f", totals[6]), R.drawable.icon4));
             collectorCaptions.set(5, new CollectorCaption(NAMES[5], ranking[5],"", "", "Monthly", String.format("%.2f", totals[7]), R.drawable.icon5));
+            collectorCaptions.set(6, new CollectorCaption(NAMES[6], ranking[6],"", "", "Monthly", String.format("%.2f", totals[8]), R.drawable.icon6));
             collectorCaptionRVA.notifyDataSetChanged();
         }
 
@@ -296,8 +302,8 @@ public class MainActivity extends AppCompatActivity {
                 PdfWriter.getInstance(document, new FileOutputStream(new File(Environment.getExternalStorageDirectory(),"excel.pdf")));
                 document.open();
 
-                PdfPTable table = new PdfPTable(9);
-                table.setWidths(new float[]{2.5f, 9.2f, 10f, 9.2f, 10f, 9.2f, 10f, 9.2f, 9.2f});
+                PdfPTable table = new PdfPTable(10);
+                table.setWidths(new float[]{2.5f, 9.2f, 10f, 9.2f, 10f, 9.2f, 10f, 9.2f, 9.2f, 9.2f});
                 table.setWidthPercentage(100f);
                 PdfPCell cell;
                 String[] x;
@@ -308,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
                 x = new String[]{"GC APPLIANCE CORPORATION", "COLLECTION REPORT", "FOR " + monthText[month].toUpperCase() + " " + String.valueOf(year).toUpperCase()};
                 for(String y : x){
                     cell = new PdfPCell(new Phrase(y, font));
-                    cell.setColspan(9);
+                    cell.setColspan(10);
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                     cell.setBorder(Rectangle.NO_BORDER);
                     table.addCell(cell);
@@ -317,12 +323,12 @@ public class MainActivity extends AppCompatActivity {
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 9; i++)
+                for (int i = 1; i <= 10; i++)
                     table.addCell(cell);
 
                 // COLLECTORS
-                font = new Font(timesroman, 12);
-                x = new String[]{"", "RICKY", "EDMUND", "DAILY", "JOHNNY", "DAILY", "CHARLIE", "ROMY", "ALLAN"};
+                font = new Font(timesroman, 11);
+                x = new String[]{"", "RICKY", "EDMUND", "DAILY", "JOHNNY", "DAILY", "CHARLIE", "ROMY", "ALLAN", "DELFIN"};
                 for(String y : x){
                     cell = new PdfPCell(new Phrase(y, font));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -331,8 +337,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // DATA 1 to 32
-                int[] order = {4, 0, 1, 2, 3, 5, 6, 7};
-                double[] initialtotal = new double[]{0, 0, 0, 0, 0, 0, 0, 0};
+                int[] order = {4, 0, 1, 2, 3, 5, 6, 7, 8};
+                double[] initialtotal = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
                 for (int index = 1; index <= 32; index++){
                     if (index <= 31){
                         cell = new PdfPCell(new Phrase(String.valueOf(index), font));
@@ -381,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 4; i++)
+                for (int i = 1; i <= 5; i++)
                     table.addCell(cell);
 
                 // INITIAL TOTAL SET B1
@@ -406,7 +412,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // INITIAL TOTAL SET B2
-                for (int collectorIndex = 5; collectorIndex <= 7; collectorIndex++){
+                for (int collectorIndex = 5; collectorIndex <= 8; collectorIndex++){
                     temp = String.format("%.2f", initialtotal[collectorIndex]);
                     if (temp.contains(".00"))
                         temp = temp.replace(".00", "");
@@ -463,7 +469,7 @@ public class MainActivity extends AppCompatActivity {
                     table.addCell(cell);
                 }
 
-                for (int collectorIndex = 5; collectorIndex <= 7; collectorIndex++){
+                for (int collectorIndex = 5; collectorIndex <= 8; collectorIndex++){
                     temp = String.format("%.2f", totals[collectorIndex]);
                     if (temp.contains(".00"))
                         temp = temp.replace(".00", "");
@@ -493,7 +499,7 @@ public class MainActivity extends AppCompatActivity {
                     table.addCell(cell);
                 }
 
-                for (int i = 3; i <= 5; i++){
+                for (int i = 3; i <= 6; i++){
                     cell = new PdfPCell(new Phrase(ranking[i], font));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                     cell.setBorder(Rectangle.NO_BORDER);
@@ -511,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
                 cell = new PdfPCell(new Phrase("GRAND TOTAL", font));
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 cell.setBorder(Rectangle.NO_BORDER);
-                cell.setColspan(2);
+                cell.setColspan(3);
                 table.addCell(cell);
 
                 temp = String.format("%.2f", grandTotal);
@@ -526,7 +532,7 @@ public class MainActivity extends AppCompatActivity {
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 1; i++)
+                for (int i = 1; i <= 2; i++)
                     table.addCell(cell);
 
                 // TRADEMARK
