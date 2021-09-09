@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     double[] totals;
     double grandTotal;
     String[] monthText = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-    String[] NAMES = {"Edmund", "Johnny", "Ricky", "Romy", "Allan", "Delfin"};
+    String[] NAMES = {"Edmund", "Johnny", "Romy", "Allan", "Delfin"};
     String[] ranking;
 
     TextView textViewMonth, textViewGT;
@@ -171,12 +171,10 @@ public class MainActivity extends AppCompatActivity {
             ranks.add(new Rank(3, totals[5]));
         if (totals[6] >= 170000)
             ranks.add(new Rank(4, totals[6]));
-        if (totals[7] >= 170000)
-            ranks.add(new Rank(5, totals[7]));
 
         String[] rankCaption = {"1st", "2nd", "3rd"};
         int rankSize = ranks.size();
-        ranking = new String[]{"", "", "", "", "", ""};
+        ranking = new String[]{"", "", "", "", ""};
         for (int i = 0; i < rankSize; i++){
             if (i == 3)
                 break;
@@ -196,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
             collectorCaptions.add(new CollectorCaption(NAMES[2], ranking[2],"", "", "Monthly", String.format("%.2f", totals[4]), R.drawable.icon2));
             collectorCaptions.add(new CollectorCaption(NAMES[3], ranking[3],"", "", "Monthly", String.format("%.2f", totals[5]), R.drawable.icon3));
             collectorCaptions.add(new CollectorCaption(NAMES[4], ranking[4],"", "", "Monthly", String.format("%.2f", totals[6]), R.drawable.icon4));
-            collectorCaptions.add(new CollectorCaption(NAMES[5], ranking[5],"", "", "Monthly", String.format("%.2f", totals[7]), R.drawable.icon5));
             collectorCaptionRVA = new CollectorCaptionRecyclerViewAdapter(this, collectorCaptions);
             recyclerViewCollectorCaption.setAdapter(collectorCaptionRVA);
             recyclerViewCollectorCaption.setLayoutManager(new LinearLayoutManager(this));
@@ -206,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
             collectorCaptions.set(2, new CollectorCaption(NAMES[2], ranking[2],"", "", "Monthly", String.format("%.2f", totals[4]), R.drawable.icon2));
             collectorCaptions.set(3, new CollectorCaption(NAMES[3], ranking[3],"", "", "Monthly", String.format("%.2f", totals[5]), R.drawable.icon3));
             collectorCaptions.set(4, new CollectorCaption(NAMES[4], ranking[4],"", "", "Monthly", String.format("%.2f", totals[6]), R.drawable.icon4));
-            collectorCaptions.set(5, new CollectorCaption(NAMES[5], ranking[5],"", "", "Monthly", String.format("%.2f", totals[7]), R.drawable.icon5));
             collectorCaptionRVA.notifyDataSetChanged();
         }
 
@@ -282,8 +278,8 @@ public class MainActivity extends AppCompatActivity {
                 PdfWriter.getInstance(document, new FileOutputStream(new File(Environment.getExternalStorageDirectory(),"excel.pdf")));
                 document.open();
 
-                PdfPTable table = new PdfPTable(9);
-                table.setWidths(new float[]{3f, 9.2f, 10f, 9.2f, 9.2f, 9.2f, 9.2f, 9.2f, 9.2f});
+                PdfPTable table = new PdfPTable(8);
+                table.setWidths(new float[]{3f, 10f, 9.2f, 9.2f, 9.2f, 9.2f, 9.2f, 9.2f});
                 table.setWidthPercentage(100f);
                 PdfPCell cell;
                 String[] x;
@@ -294,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
                 x = new String[]{"GC APPLIANCE CORPORATION", "COLLECTION REPORT", "FOR " + monthText[month].toUpperCase() + " " + String.valueOf(year).toUpperCase()};
                 for(String y : x){
                     cell = new PdfPCell(new Phrase(y, font));
-                    cell.setColspan(9);
+                    cell.setColspan(8);
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                     cell.setBorder(Rectangle.NO_BORDER);
                     table.addCell(cell);
@@ -303,12 +299,12 @@ public class MainActivity extends AppCompatActivity {
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 9; i++)
+                for (int i = 1; i <= 8; i++)
                     table.addCell(cell);
 
                 // COLLECTORS
-                font = new Font(timesroman, 14);
-                x = new String[]{"", "RICKY", "EDMUND", "DAILY", "JOHNNY", "DAILY", "ROMY", "ALLAN", "DELFIN"};
+                font = new Font(timesroman, 12);
+                x = new String[]{"", "EDMUND", "DAILY", "JOHNNY", "DAILY", "ROMY", "ALLAN", "DELFIN"};
                 for(String y : x){
                     cell = new PdfPCell(new Phrase(y, font));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -318,8 +314,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // DATA 1 to 32
                 font = new Font(timesroman, 12);
-                int[] order = {4, 0, 1, 2, 3, 5, 6, 7};
-                double[] initialtotal = new double[]{0, 0, 0, 0, 0, 0, 0, 0};
+                int[] order = {4, 0, 1, 2, 3, 5, 6};
+                double[] initialtotal = new double[]{0, 0, 0, 0, 0, 0, 0};
                 for (int index = 1; index <= 32; index++){
                     if (index <= 31){
                         cell = new PdfPCell(new Phrase(String.valueOf(index), font));
@@ -368,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 4; i++)
+                for (int i = 1; i <= 3; i++)
                     table.addCell(cell);
 
                 // INITIAL TOTAL SET B1
@@ -393,7 +389,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // INITIAL TOTAL SET B2
-                for (int collectorIndex = 5; collectorIndex <= 7; collectorIndex++){
+                for (int collectorIndex = 5; collectorIndex <= 6; collectorIndex++){
                     temp = String.format("%.2f", initialtotal[collectorIndex]);
                     if (temp.contains(".00"))
                         temp = temp.replace(".00", "");
@@ -450,7 +446,7 @@ public class MainActivity extends AppCompatActivity {
                     table.addCell(cell);
                 }
 
-                for (int collectorIndex = 5; collectorIndex <= 7; collectorIndex++){
+                for (int collectorIndex = 5; collectorIndex <= 6; collectorIndex++){
                     temp = String.format("%.2f", totals[collectorIndex]);
                     if (temp.contains(".00"))
                         temp = temp.replace(".00", "");
@@ -480,7 +476,7 @@ public class MainActivity extends AppCompatActivity {
                     table.addCell(cell);
                 }
 
-                for (int i = 3; i <= 5; i++){
+                for (int i = 3; i <= 4; i++){
                     cell = new PdfPCell(new Phrase(ranking[i], font));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                     cell.setBorder(Rectangle.NO_BORDER);
@@ -490,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 10; i++)
+                for (int i = 1; i <= 9; i++)
                     table.addCell(cell);
 
                 // GRAND TOTAL
@@ -509,12 +505,6 @@ public class MainActivity extends AppCompatActivity {
                 cell.setBorder(Rectangle.NO_BORDER);
                 cell.setColspan(3);
                 table.addCell(cell);
-
-                // SPACER
-                cell = new PdfPCell(new Phrase(" ", font));
-                cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 1; i++)
-                    table.addCell(cell);
 
                 // TRADEMARK
                 font = new Font(timesroman, 12);
