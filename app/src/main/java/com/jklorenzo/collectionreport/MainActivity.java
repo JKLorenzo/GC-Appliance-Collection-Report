@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // DATA 1 to 32
                 font = new Font(timesroman, 12);
-                int[] order = {4, 0, 1, 2, 3, 5, 6};
+                int[] order = {0, 1, 2, 3, 4, 5, 6};
                 double[] initialtotal = new double[]{0, 0, 0, 0, 0, 0, 0};
                 for (int index = 1; index <= 32; index++){
                     if (index <= 31){
@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 2; i++)
+                for (int i = 1; i <= 1; i++)
                     table.addCell(cell);
 
                 // INITIAL TOTAL SET A1
@@ -364,17 +364,8 @@ public class MainActivity extends AppCompatActivity {
                 // SPACER
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.setBorder(Rectangle.NO_BORDER);
-                for (int i = 1; i <= 3; i++)
+                for (int i = 1; i <= 4; i++)
                     table.addCell(cell);
-
-                // INITIAL TOTAL SET B1
-                temp = String.format("%.2f", initialtotal[4]);
-                if (temp.contains(".00"))
-                    temp = temp.replace(".00", "");
-                cell = new PdfPCell(new Phrase(temp, font));
-                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                cell.setBorder(Rectangle.NO_BORDER);
-                table.addCell(cell);
 
                 // INITIAL TOTAL SET A2
                 for (int collectorIndex = 0; collectorIndex <= 3; collectorIndex+=2){
@@ -389,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // INITIAL TOTAL SET B2
-                for (int collectorIndex = 5; collectorIndex <= 6; collectorIndex++){
+                for (int collectorIndex = 4; collectorIndex <= 6; collectorIndex++){
                     temp = String.format("%.2f", initialtotal[collectorIndex]);
                     if (temp.contains(".00"))
                         temp = temp.replace(".00", "");
@@ -427,15 +418,7 @@ public class MainActivity extends AppCompatActivity {
                     table.addCell(cell);
 
                 // TOTAL
-                temp = String.format("%.2f", totals[4]);
-                if (temp.contains(".00"))
-                    temp = temp.replace(".00", "");
-                cell = new PdfPCell(new Phrase(temp, font));
-                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                cell.setBorder(Rectangle.NO_BORDER);
-                table.addCell(cell);
-
-                for (int collectorIndex = 0; collectorIndex < 4; collectorIndex+=2){
+                for (int collectorIndex = 0; collectorIndex <= 3; collectorIndex+=2){
                     temp = String.format("%.2f", totals[collectorIndex] + totals[collectorIndex+1]);
                     if (temp.contains(".00"))
                         temp = temp.replace(".00", "");
@@ -446,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
                     table.addCell(cell);
                 }
 
-                for (int collectorIndex = 5; collectorIndex <= 6; collectorIndex++){
+                for (int collectorIndex = 4; collectorIndex <= 6; collectorIndex++){
                     temp = String.format("%.2f", totals[collectorIndex]);
                     if (temp.contains(".00"))
                         temp = temp.replace(".00", "");
@@ -463,11 +446,6 @@ public class MainActivity extends AppCompatActivity {
                     table.addCell(cell);
 
                 // Rankings
-                cell = new PdfPCell(new Phrase(ranking[2], font));
-                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                cell.setBorder(Rectangle.NO_BORDER);
-                table.addCell(cell);
-
                 for (int i = 0; i <= 1; i++){
                     cell = new PdfPCell(new Phrase(ranking[i], font));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -476,7 +454,7 @@ public class MainActivity extends AppCompatActivity {
                     table.addCell(cell);
                 }
 
-                for (int i = 3; i <= 4; i++){
+                for (int i = 2; i <= 4; i++){
                     cell = new PdfPCell(new Phrase(ranking[i], font));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                     cell.setBorder(Rectangle.NO_BORDER);
